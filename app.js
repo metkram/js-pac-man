@@ -4,22 +4,22 @@ class Game {
     this.pacMan = new PacMan();
     this.timer;
   }
-  render() {
-    console.clear()
-    console.log(this.field.grid[this.pacMan.coordinates[0] + PacMan.direction[this.pacMan.nextMove][0]][this.pacMan.coordinates[1] + PacMan.direction[this.pacMan.nextMove][1]]);
-    this.field.grid[this.pacMan.coordinates[0] - PacMan.direction[this.pacMan.nextMove][0]][this.pacMan.coordinates[1] - PacMan.direction[this.pacMan.nextMove][1]] = "_";
-    this.field.grid[this.pacMan.coordinates[0]][this.pacMan.coordinates[1]] = PacMan.image[this.pacMan.nextMove];
-    for (let line of this.field.grid) {
+  render({field, pacManY, pacManX, pacManDirY, pacManDirX, nextMove}) {
+    console.clear();
+    console.log(field[pacManY - pacManDirY][pacManX - pacManDirX]);
+    field[pacManY - pacManDirY][pacManX - pacManDirX] = "_"; //I have to fix borber render
+    field[pacManY][pacManX] = PacMan.image[nextMove];
+    for (let line of field) {
       console.log(line.join());
     }
   }
 
-  move() {
-    if (this.field.grid[this.pacMan.coordinates[0] + PacMan.direction[this.pacMan.nextMove][0]][this.pacMan.coordinates[1] + PacMan.direction[this.pacMan.nextMove][1]] == "#") {
+  move({field, pacManY, pacManX, pacManDirY, pacManDirX, nextMove}) {
+    if (field[pacManY + pacManDirY][pacManX + pacManDirX] == "#") {
       this.stop();
     } else {
-      this.pacMan.coordinates[0] += PacMan.direction[this.pacMan.nextMove][0];
-      this.pacMan.coordinates[1] += PacMan.direction[this.pacMan.nextMove][1];
+      this.pacMan.coordinates[0] += pacManDirY;
+      this.pacMan.coordinates[1] += pacManDirX;
     }
   }
 
@@ -27,8 +27,16 @@ class Game {
     console.log("hi there, soon I'll be the Pac-Man game");
     let t = this;
     setTimeout(function run() {
-      t.move();
-      t.render();
+      let options = {
+        field: t.field.grid,
+        pacManY: t.pacMan.coordinates[0],
+        pacManX: t.pacMan.coordinates[1],
+        pacManDirY: PacMan.direction[t.pacMan.nextMove][0],
+        pacManDirX: PacMan.direction[t.pacMan.nextMove][1],
+        nextMove: t.pacMan.nextMove,
+      };
+      t.move(options);
+      t.render(options);
       setTimeout(run, 1000);// here is the problem setTimeout runs itself and this.stop method doesn't work
     }, 1000);
   }
